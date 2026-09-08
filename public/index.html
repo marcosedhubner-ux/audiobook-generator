@@ -1,0 +1,140 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Audiobook Generator</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <div class="page">
+      <header class="header">
+        <svg class="book-icon" viewBox="0 0 64 64" aria-hidden="true">
+          <path
+            d="M32 14c-6-4-14-6-22-6v38c8 0 16 2 22 6 6-4 14-6 22-6V8c-8 0-16 2-22 6Z"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linejoin="round"
+          />
+          <path d="M32 14v38" fill="none" stroke="currentColor" stroke-width="2.5" />
+          <path d="M14 18c5 0 10 1 13 3M14 26c5 0 10 1 13 3M14 34c5 0 10 1 13 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <path d="M50 18c-5 0-10 1-13 3M50 26c-5 0-10 1-13 3M50 34c-5 0-10 1-13 3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+        </svg>
+        <h1>Audiobook Generator</h1>
+        <p class="subtitle">Transforme livros em audiobooks narrados por vozes naturais</p>
+      </header>
+
+      <main class="card">
+        <form id="generate-form">
+          <div id="dropzone" class="dropzone" tabindex="0">
+            <div id="dropzone-prompt">
+              <svg class="upload-icon" viewBox="0 0 48 48" aria-hidden="true">
+                <path d="M24 6v24m0-24 9 9m-9-9-9 9" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+                <path d="M8 32v6a4 4 0 0 0 4 4h24a4 4 0 0 0 4-4v-6" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+              </svg>
+              <p class="dropzone-text">
+                Arraste um PDF ou TXT aqui, ou
+                <button type="button" id="browse-button" class="link-button">clique para escolher</button>
+              </p>
+            </div>
+
+            <div id="file-card" class="file-card" hidden>
+              <svg class="file-card-icon" viewBox="0 0 48 48" aria-hidden="true">
+                <path
+                  d="M12 4h16l8 8v28a2 2 0 0 1-2 2H12a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                  stroke-linejoin="round"
+                />
+                <path d="M28 4v8h8" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linejoin="round" />
+              </svg>
+              <div class="file-card-info">
+                <p id="file-card-name" class="file-card-name"></p>
+                <p id="file-card-meta" class="file-card-meta"></p>
+              </div>
+              <button type="button" id="remove-file-button" class="remove-file-button" title="Remover arquivo">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6 6l12 12M18 6 6 18" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" />
+                </svg>
+              </button>
+            </div>
+
+            <input type="file" id="file-input" accept=".pdf,.txt" hidden />
+          </div>
+
+          <div class="field">
+            <label for="folder-name">Nome do livro (pasta em Audios/)</label>
+            <div class="folder-row">
+              <input type="text" id="folder-name" placeholder="Ex: Dom Casmurro" />
+              <button type="button" id="folder-picker-button" class="icon-button" title="Escolher pasta existente">
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M3 6a1 1 0 0 1 1-1h5l2 2h9a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1Z"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linejoin="round"
+                  />
+                </svg>
+              </button>
+              <ul id="folder-picker-list" class="folder-picker-list" hidden></ul>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="voice-select">Voz</label>
+            <div class="voice-row">
+              <select id="voice-select" required>
+                <option value="">Carregando vozes...</option>
+              </select>
+              <button type="button" id="voice-preview-button" class="icon-button" title="Ouvir exemplo desta voz" disabled>
+                <svg class="icon-play" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M8 5v14l11-7Z" fill="currentColor" />
+                </svg>
+                <svg class="icon-loading" viewBox="0 0 24 24" aria-hidden="true">
+                  <path
+                    d="M12 3a9 9 0 1 0 9 9"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2.5"
+                    stroke-linecap="round"
+                  />
+                </svg>
+              </button>
+            </div>
+          </div>
+          <audio id="preview-player" hidden></audio>
+
+          <button type="submit" id="generate-button" class="primary-button">Gerar audiobook</button>
+        </form>
+
+        <div id="generating-view" class="generating-view" hidden>
+          <p class="generating-title">Divirta-se enquanto finalizamos seu audiobook</p>
+          <p id="snake-score" class="snake-score">Macas comidas: 0</p>
+          <div class="game-wrapper">
+            <canvas id="snake-canvas" width="280" height="280"></canvas>
+            <button type="button" id="snake-start-button" class="primary-button game-overlay-button">Start</button>
+          </div>
+        </div>
+
+        <div id="status-area" class="status-area">
+          <p id="status-text">Clique para gerar o seu Audiobook...</p>
+          <progress id="progress-bar" max="100" value="0" hidden></progress>
+          <p id="warning-text" class="warning-text" hidden></p>
+        </div>
+
+        <button type="button" id="cancel-button" class="secondary-button" hidden>Cancelar execucao</button>
+
+        <p id="error-text" class="error-text" hidden></p>
+      </main>
+
+      <footer class="footer">
+        <p>&copy; 2026 Marcos Hubner - HubnerSkill@gmail.com</p>
+      </footer>
+    </div>
+
+    <script src="/app.js" type="module"></script>
+  </body>
+</html>
